@@ -53,6 +53,11 @@ def call(Map pipelineParams) {
             DOCKER_CREDS = credentials("dockerhub_creds")
             //JFROG_DOCKER_REPO = "i27.jfrog.io"
 
+            // Kuberentes Dev Cluster Details 
+            DEV_CLUSTER_NAME = "i27-cluster"
+            DEV_CLUSTER_ZONE = "us-central1-a"
+            DEV_PROJECT_ID = "proven-wavelet-481608-k1"
+
         }
         stages {
             stage ('build'){
@@ -115,11 +120,11 @@ def call(Map pipelineParams) {
                 steps {
                     script {
                         // Image Validattion
-                        //imageValidation().call()
+                        imageValidation().call()
                         // Calling the method and passing the arguments
                         //dockerDeploy('dev', '5761').call()
                         // Calling k8s Auth method
-                        k8s.auth_login()
+                        k8s.auth_login("${env.DEV_CLUSTER_NAME}", "${env.DEV_CLUSTER_ZONE}", "${env.DEV_PROJECT_ID}")
                     }
                 }
             }

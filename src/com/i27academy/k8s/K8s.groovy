@@ -8,10 +8,10 @@ class K8s {
     }
 
     // method to connect to gke clusters
-    def auth_login() {
+    def auth_login(clusterName, zone, projectID) {
         jenkins.sh """
             echo "******************* Authenticating to K8S Cluster ***********"
-            gcloud container clusters get-credentials i27-cluster --zone us-central1-a --project proven-wavelet-481608-k1
+            gcloud container clusters get-credentials $clusterName --zone $zone --project $projectID
             kubectl get nodes
         """
     }
