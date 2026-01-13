@@ -16,6 +16,14 @@ class K8s {
         """
     }
 
+    // Method to Deploy Applications into k8s 
+    def k8sdeploy(){
+        jenkins.sh """
+            echo "************** Deploying to k8s Cluster *********************"
+        """
+
+    }
+
     // method to connect to eks clusters
 }
 
