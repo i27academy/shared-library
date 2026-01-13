@@ -125,8 +125,7 @@ def call(Map pipelineParams) {
                         //dockerDeploy('dev', '5761').call()
                         // Calling k8s Auth method
                         k8s.auth_login("${env.DEV_CLUSTER_NAME}", "${env.DEV_CLUSTER_ZONE}", "${env.DEV_PROJECT_ID}")
-                        sh "ls -la"
-                        sh "ls -la .cicd"
+                        k8s.k8sdeploy()
                     }
                 }
             }
