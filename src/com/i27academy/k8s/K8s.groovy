@@ -20,7 +20,7 @@ class K8s {
     def k8sdeploy(k8sManifests_file, docker_image ,namespace){
         jenkins.sh """
             echo "************** Deploying to k8s Cluster *********************"
-            sed -i 's|DIT|${docker_image}|g' ./.cicd/{$k8sManifests_file}
+            sed -i 's|DIT|${docker_image}|g' ./.cicd/$k8sManifests_file
             kubectl apply -f ./.cicd/$k8sManifests_file -n $namespace
         """
 
