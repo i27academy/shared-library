@@ -58,6 +58,18 @@ def call(Map pipelineParams) {
             DEV_CLUSTER_ZONE = "us-central1-a"
             DEV_PROJECT_ID = "proven-wavelet-481608-k1"
 
+            // File Names for Deployments
+            K8S_DEV_FILE = "k8s_dev.yaml"
+            K8S_TEST_FILE = "k8s_test.yaml"
+            K8S_STAGE_FILE = "k8s_stage.yaml"
+            K8S_PROD_FILE = "k8s_prod.yaml"
+
+
+            // Namespace Definitions 
+            DEV_NAMESPACE = "i27-cart-dev-ns"
+            TEST_NAMESPACE = "i27-cart-test-ns"
+            STAGE_NAMESPACE = "i27-cart-stage-ns"
+            PROD_NAMESPACE = "i27-cart-prod-ns"
         }
         stages {
             stage ('build'){
@@ -119,13 +131,14 @@ def call(Map pipelineParams) {
                 }
                 steps {
                     script {
+                        def docker_image = "${env.DOCKER_HUB}/${env.APPLICATION_NAME}:$GIT_COMMIT"
                         // Image Validattion
                         imageValidation().call()
                         // Calling the method and passing the arguments
                         //dockerDeploy('dev', '5761').call()
                         // Calling k8s Auth method
                         k8s.auth_login("${env.DEV_CLUSTER_NAME}", "${env.DEV_CLUSTER_ZONE}", "${env.DEV_PROJECT_ID}")
-                        k8s.k8sdeploy()
+                        k8s.k8sdeploy("${env.K8S_DEV_FILE}", docker_image, "${env.DEV_NAMESPACE}")
                     }
                 }
             }
