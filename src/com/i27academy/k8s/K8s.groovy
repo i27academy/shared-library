@@ -20,14 +20,22 @@ class K8s {
     def k8sdeploy(k8sManifests_file, docker_image ,namespace){
         jenkins.sh """
             echo "************** Deploying to k8s Cluster *********************"
+            ls -la 
             sed -i 's|DIT|${docker_image}|g' ./.cicd/$k8sManifests_file
             kubectl apply -f ./.cicd/$k8sManifests_file -n $namespace
         """
 
     }
-
-    // method to connect to eks clusters
+     
+     // Helm Deployment 
+     def k8sHelmChartDeploy(appName, env){
+        jenkins.sh """
+            echo "************** Deploying to k8s Cluster using HELM *********************"
+            helm install $appName-$env-release CHART_NEEDS_TO_BE_UPDATED -f values.yaml -n $env-namespace
+        """
+     }
 }
+// helm install eureka-dev-release chartname -f values.yaml -n namespace
 
 
 //gcloud container clusters get-credentials i27-cluster --zone us-central1-a --project proven-wavelet-481608-k1
