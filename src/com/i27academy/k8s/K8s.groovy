@@ -26,14 +26,24 @@ class K8s {
         """
 
     }
+
+    // cloing the shared library
+    def gitClone (){
+        jenkins.sh """
+            echo "************** Cloning the shared library repo *********************"
+            git clone -b main https://github.com/i27academy/shared-library.git
+            echo "Listing the files after cloning the repo"
+            ls -la 
+        """
+    }
      
      // Helm Deployment 
-     def k8sHelmChartDeploy(appName, env){
-        jenkins.sh """
-            echo "************** Deploying to k8s Cluster using HELM *********************"
-            helm install $appName-$env-release CHART_NEEDS_TO_BE_UPDATED -f values.yaml -n $env-namespace
-        """
-     }
+    //  def k8sHelmChartDeploy(appName, env){
+    //     jenkins.sh """
+    //         echo "************** Deploying to k8s Cluster using HELM *********************"
+    //         helm install $appName-$env-release CHART_NEEDS_TO_BE_UPDATED -f values.yaml -n $env-namespace
+    //     """
+    //  }
 }
 // helm install eureka-dev-release chartname -f values.yaml -n namespace
 

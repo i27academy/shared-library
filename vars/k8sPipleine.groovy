@@ -57,6 +57,9 @@ def call(Map pipelineParams) {
             DEV_CLUSTER_NAME = "i27-cluster"
             DEV_CLUSTER_ZONE = "us-central1-a"
             DEV_PROJECT_ID = "proven-wavelet-481608-k1"
+            TEST_PROJECT_ID = "proven-wavelet-481608-k1"
+            STAGE_PROJECT_ID = "proven-wavelet-481608-k1"
+            PROD_PROJECT_ID = "PROD_PROJECT_ID_HERE"
 
             // File Names for Deployments
             K8S_DEV_FILE = "k8s_dev.yaml"
@@ -72,6 +75,14 @@ def call(Map pipelineParams) {
             PROD_NAMESPACE = "i27-cart-prod-ns"
         }
         stages {
+            stage ('GitCheckout'){
+                steps {
+                    script {
+                        // Cloning the shared library repo
+                        k8s.gitClone()
+                    }
+                }
+            }
             stage ('build'){
                 when {
                     anyOf {
@@ -131,6 +142,7 @@ def call(Map pipelineParams) {
                 }
                 steps {
                     script {
+                        // Defining docker image
                         def docker_image = "${env.DOCKER_HUB}/${env.APPLICATION_NAME}:$GIT_COMMIT"
                         // Image Validattion
                         imageValidation().call()
@@ -152,10 +164,15 @@ def call(Map pipelineParams) {
                 }
                 steps {
                     script {
+                        // Defining docker image
+                        def docker_image = "${env.DOCKER_HUB}/${env.APPLICATION_NAME}:$GIT_COMMIT"
                         // Image Validattion
                         imageValidation().call()
-                        // Calling the method and passing the arguments
-                        dockerDeploy('test', '6761').call()
+                        // Calling k8s Auth method
+                        k8s.auth_login("${env.TEST_CLUSTER_NAME}", "${env.TEST_CLUSTER_ZONE}", "${env.TEST_PROJECT_ID}")
+                        // Calling K8S Deploy method
+                        k8s.k8sdeploy("${env.K8S_TEST_FILE}", docker_image, "${env.TEST_NAMESPACE}")
+
                     }
                 }
             }
@@ -174,10 +191,14 @@ def call(Map pipelineParams) {
                 }
                 steps {
                     script {
+                        // Defining docker image
+                        def docker_image = "${env.DOCKER_HUB}/${env.APPLICATION_NAME}:$GIT_COMMIT"
                         // Image Validattion
                         imageValidation().call()
-                        // Calling the method and passing the arguments
-                        dockerDeploy('stage', '7761').call()
+                        // Calling k8s Auth method
+                        k8s.auth_login("${env.STAGE_CLUSTER_NAME}", "${env.STAGE_CLUSTER_ZONE}", "${env.STAGE_PROJECT_ID}")
+                        // Calling K8S Deploy method
+                        k8s.k8sdeploy("${env.K8S_STAGE_FILE}", docker_image, "${env.STAGE_NAMESPACE}")
                     }
                 }
             }
@@ -198,8 +219,12 @@ def call(Map pipelineParams) {
                         input message: "Deploying Eureka to Production ?", ok: 'yes', submitter: 'i27academy, sreuser'
                     }
                     script {
-                        // Calling the method and passing the arguments
-                        dockerDeploy('prod', '8761').call()
+                        // Defining docker image
+                        def docker_image = "${env.DOCKER_HUB}/${env.APPLICATION_NAME}:$GIT_COMMIT"
+                        // Calling k8s Auth method
+                        k8s.auth_login("${env.PROD_CLUSTER_NAME}", "${env.PROD_CLUSTER_ZONE}", "${env.PROD_PROJECT_ID}")
+                        // Calling K8S Deploy method
+                        k8s.k8sdeploy("${env.K8S_PROD_FILE}", docker_image, "${env.PROD_NAMESPACE}")
                     }
                 }
             }
