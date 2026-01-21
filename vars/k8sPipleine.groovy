@@ -235,6 +235,7 @@ def call(Map pipelineParams) {
                         cleanWs()
                     }
                 }
+            }
 
         }
     }
