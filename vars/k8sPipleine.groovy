@@ -228,6 +228,13 @@ def call(Map pipelineParams) {
                     }
                 }
             }
+            stage ('Cleanup') {
+                steps {
+                    script {
+                        echo "Cleaning up the workspace"
+                        cleanWs()
+                    }
+                }
 
         }
     }
