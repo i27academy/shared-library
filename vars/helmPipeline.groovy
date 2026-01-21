@@ -1,7 +1,11 @@
 // This pipleine is implemented for all java based applications 
 // this should work for eureka, user, product as well...
+// import k8s method
+import com.i27academy.k8s.K8s
 
 def call(Map pipelineParams) {
+    // instance 
+    K8s k8s = new K8s(this)
     pipeline {
         agent {
             label 'k8s-slave'
@@ -30,7 +34,7 @@ def call(Map pipelineParams) {
             choice(name: 'deployToStage',
                 choices: 'no\nyes',
                 description: 'This will deploy the application to Stage environment'
-            )   
+            )
             choice(name: 'deployToProd',
                 choices: 'no\nyes',
                 description: 'This will deploy the application to Prod environment'
@@ -49,8 +53,39 @@ def call(Map pipelineParams) {
             DOCKER_CREDS = credentials("dockerhub_creds")
             //JFROG_DOCKER_REPO = "i27.jfrog.io"
 
+            // Kuberentes Dev Cluster Details 
+            DEV_CLUSTER_NAME = "i27-cluster"
+            DEV_CLUSTER_ZONE = "us-central1-a"
+            DEV_PROJECT_ID = "proven-wavelet-481608-k1"
+            TEST_PROJECT_ID = "proven-wavelet-481608-k1"
+            STAGE_PROJECT_ID = "proven-wavelet-481608-k1"
+            PROD_PROJECT_ID = "PROD_PROJECT_ID_HERE"
+
+            // File Names for Deployments
+            K8S_DEV_FILE = "k8s_dev.yaml"
+            K8S_TEST_FILE = "k8s_test.yaml"
+            K8S_STAGE_FILE = "k8s_stage.yaml"
+            K8S_PROD_FILE = "k8s_prod.yaml"
+
+
+            // Namespace Definitions 
+            DEV_NAMESPACE = "i27-cart-dev-ns"
+            TEST_NAMESPACE = "i27-cart-test-ns"
+            STAGE_NAMESPACE = "i27-cart-stage-ns"
+            PROD_NAMESPACE = "i27-cart-prod-ns"
+
+            // Chart path details
+            HELM_CHART_PATH = "${workpace}/shared-library/chart"
         }
         stages {
+            stage ('GitCheckout'){
+                steps {
+                    script {
+                        // Cloning the shared library repo
+                        k8s.gitClone()
+                    }
+                }
+            }
             stage ('build'){
                 when {
                     anyOf {
@@ -110,10 +145,16 @@ def call(Map pipelineParams) {
                 }
                 steps {
                     script {
+                        // Defining docker image
+                        def docker_image = "${env.DOCKER_HUB}/${env.APPLICATION_NAME}:$GIT_COMMIT"
                         // Image Validattion
                         imageValidation().call()
                         // Calling the method and passing the arguments
-                        dockerDeploy('dev', '5761').call()
+                        //dockerDeploy('dev', '5761').call()
+                        // Calling k8s Auth method
+                        k8s.auth_login("${env.DEV_CLUSTER_NAME}", "${env.DEV_CLUSTER_ZONE}", "${env.DEV_PROJECT_ID}")
+                        //k8s.k8sdeploy("${env.K8S_DEV_FILE}", docker_image, "${env.DEV_NAMESPACE}")
+                        k8s.k8sHelmChartDeploy("${env.APPLICATION_NAME}", "dev", "${HELM_CHART_PATH}" , "$GIT_COMMIT", "${env.DEV_NAMESPACE}") 
                     }
                 }
             }
@@ -127,10 +168,15 @@ def call(Map pipelineParams) {
                 }
                 steps {
                     script {
+                        // Defining docker image
+                        def docker_image = "${env.DOCKER_HUB}/${env.APPLICATION_NAME}:$GIT_COMMIT"
                         // Image Validattion
                         imageValidation().call()
-                        // Calling the method and passing the arguments
-                        dockerDeploy('test', '6761').call()
+                        // Calling k8s Auth method
+                        k8s.auth_login("${env.TEST_CLUSTER_NAME}", "${env.TEST_CLUSTER_ZONE}", "${env.TEST_PROJECT_ID}")
+                        // Calling K8S Deploy method
+                        k8s.k8sdeploy("${env.K8S_TEST_FILE}", docker_image, "${env.TEST_NAMESPACE}")
+
                     }
                 }
             }
@@ -149,10 +195,14 @@ def call(Map pipelineParams) {
                 }
                 steps {
                     script {
+                        // Defining docker image
+                        def docker_image = "${env.DOCKER_HUB}/${env.APPLICATION_NAME}:$GIT_COMMIT"
                         // Image Validattion
                         imageValidation().call()
-                        // Calling the method and passing the arguments
-                        dockerDeploy('stage', '7761').call()
+                        // Calling k8s Auth method
+                        k8s.auth_login("${env.STAGE_CLUSTER_NAME}", "${env.STAGE_CLUSTER_ZONE}", "${env.STAGE_PROJECT_ID}")
+                        // Calling K8S Deploy method
+                        k8s.k8sdeploy("${env.K8S_STAGE_FILE}", docker_image, "${env.STAGE_NAMESPACE}")
                     }
                 }
             }
@@ -173,8 +223,20 @@ def call(Map pipelineParams) {
                         input message: "Deploying Eureka to Production ?", ok: 'yes', submitter: 'i27academy, sreuser'
                     }
                     script {
-                        // Calling the method and passing the arguments
-                        dockerDeploy('prod', '8761').call()
+                        // Defining docker image
+                        def docker_image = "${env.DOCKER_HUB}/${env.APPLICATION_NAME}:$GIT_COMMIT"
+                        // Calling k8s Auth method
+                        k8s.auth_login("${env.PROD_CLUSTER_NAME}", "${env.PROD_CLUSTER_ZONE}", "${env.PROD_PROJECT_ID}")
+                        // Calling K8S Deploy method
+                        k8s.k8sdeploy("${env.K8S_PROD_FILE}", docker_image, "${env.PROD_NAMESPACE}")
+                    }
+                }
+            }
+            stage ('Cleanup') {
+                steps {
+                    script {
+                        echo "Cleaning up the workspace"
+                        cleanWs()
                     }
                 }
             }

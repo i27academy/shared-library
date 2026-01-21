@@ -40,12 +40,12 @@ class K8s {
     }
      
      // Helm Deployment 
-    //  def k8sHelmChartDeploy(appName, env){
-    //     jenkins.sh """
-    //         echo "************** Deploying to k8s Cluster using HELM *********************"
-    //         helm install $appName-$env-release CHART_NEEDS_TO_BE_UPDATED -f values.yaml -n $env-namespace
-    //     """
-    //  }
+     def k8sHelmChartDeploy(appName, env, helmChartPath, imageTag, namespace  ){
+        jenkins.sh """
+            echo "************** Deploying to k8s Cluster using HELM *********************"
+            helm install $appName-$env-release -f .cicd/helm_values/values_${env}.yaml --set image.tag=$imageTag  ${helmChartPath} -n $namespace
+        """
+     }
 }
 // helm install eureka-dev-release chartname -f values.yaml -n namespace
 

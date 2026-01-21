@@ -1,0 +1,7 @@
+fullname: dummy-name
+replicas:
+  default: 1
+image:
+  name: dummy-image
+  tag: dummy-tag
+targetPort: 8761
