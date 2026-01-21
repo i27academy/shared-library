@@ -34,6 +34,8 @@ class K8s {
             git clone -b main https://github.com/i27academy/shared-library.git
             echo "Listing the files after cloning the repo"
             ls -la 
+            echo "************** Listing the shared library files *********************"
+            ls -la shared-library
         """
     }
      
