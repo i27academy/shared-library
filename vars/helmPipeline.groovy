@@ -75,7 +75,7 @@ def call(Map pipelineParams) {
             PROD_NAMESPACE = "i27-cart-prod-ns"
 
             // Chart path details
-            HELM_CHART_PATH = "${workpace}/shared-library/chart"
+            HELM_CHART_PATH = "${WORKSPACE}/shared-library/chart"
         }
         stages {
             stage ('GitCheckout'){
@@ -144,6 +144,7 @@ def call(Map pipelineParams) {
                     }
                 }
                 steps {
+                    echo "The workspace is : ${WORKSPACE}"
                     script {
                         // Defining docker image
                         def docker_image = "${env.DOCKER_HUB}/${env.APPLICATION_NAME}:$GIT_COMMIT"
