@@ -43,7 +43,14 @@ class K8s {
      def k8sHelmChartDeploy(appName, env, helmChartPath, imageTag, namespace  ){
         jenkins.sh """
             echo "************** Deploying to k8s Cluster using HELM *********************"
-            helm install $appName-$env-release -f .cicd/helm_values/values_${env}.yaml --set image.tag=$imageTag  ${helmChartPath} -n $namespace
+            # Verify if helm release exists
+            if helm list -n $namspace | grep -q "$appName-$env-release"; then
+                echo "Helm release $appName-$env-release exists. Upgrading..."
+                helm upgrade $appName-$env-release -f .cicd/helm_values/values_${env}.yaml --set image.tag=$imageTag  ${helmChartPath} -n $namespace
+            else
+                echo "Helm release $appName-$env-release does not exist. Installing..."
+                helm install $appName-$env-release -f .cicd/helm_values/values_${env}.yaml --set image.tag=$imageTag  ${helmChartPath} -n $namespace
+            fi
         """
      }
 }
