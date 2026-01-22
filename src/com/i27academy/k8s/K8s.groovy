@@ -44,7 +44,7 @@ class K8s {
         jenkins.sh """
             echo "************** Deploying to k8s Cluster using HELM *********************"
             # Verify if helm release exists
-            if helm list -n $namspace | grep -q "$appName-$env-release"; then
+            if helm list -n $namespace | grep -q "$appName-$env-release"; then
                 echo "Helm release $appName-$env-release exists. Upgrading..."
                 helm upgrade $appName-$env-release -f .cicd/helm_values/values_${env}.yaml --set image.tag=$imageTag  ${helmChartPath} -n $namespace
             else
