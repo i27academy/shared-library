@@ -5,14 +5,9 @@ def call(Map pipelineParams) {
     K8s k8s = new K8s(this)
     pipeline {
         agent {
-            label 'java-slave'
+            label 'k8s-slave'
         }
 
-        // tools section 
-        tools {
-            maven 'maven-3.8.9'
-            jdk 'JDK-17'
-        }
 
         // environment 
         environment {
