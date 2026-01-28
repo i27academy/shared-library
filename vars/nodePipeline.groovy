@@ -14,33 +14,31 @@ def call(Map pipelineParams) {
 
             APPLICATION_NAME = "${pipelineParams.appName}"
 
-            // DOCKER_HUB = "docker.io/i27devopsb7"
-            // DOCKER_CREDS = credentials('dockerhub_creds')
+            // Docker hub details 
+            DOCKER_HUB = "docker.io/i27devopsb8"
+            DOCKER_CREDS = credentials("dockerhub_creds")
+            //JFROG_DOCKER_REPO = "i27.jfrog.io"
 
-            // JFROG details
-            JFROG_DOCKER_REGISTRY = "i27k8sb15.jfrog.io"
-            JFROG_DOCKER_REPO_NAME = "private-docker"
-            JFROG_CREDS = credentials("JFROG_CREDS")
-
-            // Kubernetes Dev cluster details
-            DEV_CLUSTER_NAME = "cart-cluster"
+            // Kuberentes Dev Cluster Details 
+            DEV_CLUSTER_NAME = "i27-cluster"
             DEV_CLUSTER_ZONE = "us-central1-a"
-            DEV_PROJECT_ID = "fluid-analogy-463508-r4"
+            DEV_PROJECT_ID = "proven-wavelet-481608-k1"
+            TEST_PROJECT_ID = "proven-wavelet-481608-k1"
+            STAGE_PROJECT_ID = "proven-wavelet-481608-k1"
+            PROD_PROJECT_ID = "PROD_PROJECT_ID_HERE"
 
-
-            // File name for deployments 
+            // File Names for Deployments
             K8S_DEV_FILE = "k8s_dev.yaml"
             K8S_TEST_FILE = "k8s_test.yaml"
             K8S_STAGE_FILE = "k8s_stage.yaml"
-            K8S_PROD_FILE = "k8s_prd.yaml"
+            K8S_PROD_FILE = "k8s_prod.yaml"
 
 
-            // namespace definition 
-            DEV_NAMESPACE = "cart-dev-ns"
-            TEST_NAMESPACE = "cart-test-ns"
-            STAGE_NAMESPACE = "cart-stage-ns"
-            PROD_NAMESPACE = "cart-prod-ns"
-
+            // Namespace Definitions 
+            DEV_NAMESPACE = "i27-cart-dev-ns"
+            TEST_NAMESPACE = "i27-cart-test-ns"
+            STAGE_NAMESPACE = "i27-cart-stage-ns"
+            PROD_NAMESPACE = "i27-cart-prod-ns"
         }
 
         // parameters
