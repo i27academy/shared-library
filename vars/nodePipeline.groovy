@@ -93,7 +93,7 @@ def call(Map pipelineParams) {
                     script {
                         // image validation
                         //imageValidatiion().call()
-                        def docker_image  =  "${env.JFROG_DOCKER_REGISTRY}/${env.JFROG_DOCKER_REPO_NAME}/${env.APPLICATION_NAME}:$GIT_COMMIT"
+                       def docker_image = "${env.DOCKER_HUB}/${env.APPLICATION_NAME}:$GIT_COMMIT"
                         // calling auth login method
                         k8s.auth_login("${env.DEV_CLUSTER_NAME}", "${env.DEV_CLUSTER_ZONE}", "${env.DEV_PROJECT_ID}")
                         imageValidatiion().call()
