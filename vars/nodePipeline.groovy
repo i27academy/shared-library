@@ -204,11 +204,11 @@ def dockerDeploy(envDeploy, port){
 def dockerBuildAndPush() {
     return {
         echo "************* Building the Docker image ***************"
-        sh "docker build --no-cache -t ${env.JFROG_DOCKER_REGISTRY}/${env.JFROG_DOCKER_REPO_NAME}/${env.APPLICATION_NAME}:$GIT_COMMIT ."
+        sh "docker build --no-cache -t ${env.DOCKER_HUB}/${env.APPLICATION_NAME}:$GIT_COMMIT ."
         echo "******************************************** Docker Login *********************************"
-        sh "docker login -u ${JFROG_CREDS_USR} -p ${JFROG_CREDS_PSW} i27k8sb15.jfrog.io"
+        sh "docker login -u ${DOCKER_CREDS_USR} -p ${DOCKER_CREDS_PSW}"
         echo "******************************************** Docker Push *********************************"
-         sh "docker push ${env.JFROG_DOCKER_REGISTRY}/${env.JFROG_DOCKER_REPO_NAME}/${env.APPLICATION_NAME}:$GIT_COMMIT"
+         sh "docker push ${env.DOCKER_HUB}/${env.APPLICATION_NAME}:$GIT_COMMIT"
     }
 }
 
@@ -216,7 +216,7 @@ def imageValidatiion() {
     return {
         println ("***************************** Attempt to pull the docker image *********************")
         try {
-            sh "docker pull ${env.JFROG_DOCKER_REGISTRY}/${env.JFROG_DOCKER_REPO_NAME}/${env.APPLICATION_NAME}:$GIT_COMMIT"
+            sh "docker pull ${env.DOCKER_HUB}/${env.APPLICATION_NAME}:$GIT_COMMIT"
             println("********************** Image is Pulled Succesfully *************************")
         }
         catch(Exception e) {
